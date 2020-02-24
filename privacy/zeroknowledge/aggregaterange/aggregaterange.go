@@ -194,19 +194,12 @@ func (wit AggregatedRangeWitness) Prove() (*AggregatedRangeProof, error) {
 		return nil, errors.New("Must less than maxOutputNumber")
 	}
 	numValuePad := pad(numValue)
+	N := maxExp * numValuePad
 	aggParam := new(bulletproofParams)
-	aggParam.g = AggParam.g[0 : numValuePad*maxExp]
-	aggParam.h = AggParam.h[0 : numValuePad*maxExp]
+	aggParam.g = AggParam.g[0 : N]
+	aggParam.h = AggParam.h[0 : N]
 	aggParam.u = AggParam.u
-	csByteH := []byte{}
-	csByteG := []byte{}
-	for i := 0; i < len(aggParam.g); i++ {
-		csByteG = append(csByteG, aggParam.g[i].ToBytesS()...)
-		csByteH = append(csByteH, aggParam.h[i].ToBytesS()...)
-	}
-	aggParam.cs = append(aggParam.cs, csByteG...)
-	aggParam.cs = append(aggParam.cs, csByteH...)
-	aggParam.cs = append(aggParam.cs, aggParam.u.ToBytesS()...)
+	aggParam.cs = AggParam.cs
 
 	values := make([]uint64, numValuePad)
 	rands := make([]*privacy.Scalar, numValuePad)
@@ -215,7 +208,6 @@ func (wit AggregatedRangeWitness) Prove() (*AggregatedRangeProof, error) {
 		values[i] = wit.values[i]
 		rands[i] = new(privacy.Scalar).Set(wit.rands[i])
 	}
-
 	for i := numValue; i < numValuePad; i++ {
 		values[i] = uint64(0)
 		rands[i] = new(privacy.Scalar).FromUint64(0)
@@ -228,20 +220,19 @@ func (wit AggregatedRangeWitness) Prove() (*AggregatedRangeProof, error) {
 
 	n := maxExp
 	// Convert values to binary array
-	aL := make([]*privacy.Scalar, numValuePad*n)
+	aL := make([]*privacy.Scalar, N)
 	for i, value := range values {
-		tmp := privacy.ConvertUint64ToBinary(value, n)
-		for j := 0; j < n; j++ {
+		tmp := privacy.ConvertUint64ToBinary(value, maxExp)
+		for j := 0; j < maxExp; j++ {
 			aL[i*n+j] = tmp[j]
 		}
 	}
 
 	twoNumber := new(privacy.Scalar).FromUint64(2)
-	twoVectorN := powerVector(twoNumber, n)
+	twoVectorN := powerVector(twoNumber, maxExp)
 
-	aR := make([]*privacy.Scalar, numValuePad*n)
-
-	for i := 0; i < numValuePad*n; i++ {
+	aR := make([]*privacy.Scalar, N)
+	for i := 0; i < N; i++ {
 		aR[i] = new(privacy.Scalar).Sub(aL[i], new(privacy.Scalar).FromUint64(1))
 	}
 
@@ -257,8 +248,8 @@ func (wit AggregatedRangeWitness) Prove() (*AggregatedRangeProof, error) {
 	proof.a = A
 
 	// Random blinding vectors sL, sR
-	sL := make([]*privacy.Scalar, n*numValuePad)
-	sR := make([]*privacy.Scalar, n*numValuePad)
+	sL := make([]*privacy.Scalar, N)
+	sR := make([]*privacy.Scalar, N)
 	for i := range sL {
 		sL[i] = privacy.RandomScalar()
 		sR[i] = privacy.RandomScalar()
@@ -277,7 +268,7 @@ func (wit AggregatedRangeWitness) Prove() (*AggregatedRangeProof, error) {
 
 	// challenge y, z
 	y := generateChallenge([][]byte{aggParam.cs, A.ToBytesS(), S.ToBytesS()})
-	z := generateChallenge([][]byte{aggParam.cs, A.ToBytesS(), S.ToBytesS(), y.ToBytesS()})
+	z := generateChallenge([][]byte{A.ToBytesS(), S.ToBytesS(), y.ToBytesS()})
 
 	zNeg := new(privacy.Scalar).Sub(new(privacy.Scalar).FromUint64(0), z)
 	zSquare := new(privacy.Scalar).Mul(z, z)
@@ -433,7 +424,7 @@ func (wit AggregatedRangeWitness) Prove() (*AggregatedRangeProof, error) {
 	}
 	innerProductWit.p = innerProductWit.p.Add(innerProductWit.p, new(privacy.Point).ScalarMult(aggParam.u, proof.tHat))
 
-	proof.innerProductProof, err = innerProductWit.Prove(aggParam)
+	proof.innerProductProof, err = innerProductWit.Prove(aggParam, z.ToBytesS())
 	if err != nil {
 		return nil, err
 	}
@@ -451,15 +442,7 @@ func (proof AggregatedRangeProof) Verify() (bool, error) {
 	aggParam.g = AggParam.g[0 : numValuePad*maxExp]
 	aggParam.h = AggParam.h[0 : numValuePad*maxExp]
 	aggParam.u = AggParam.u
-	csByteH := []byte{}
-	csByteG := []byte{}
-	for i := 0; i < len(aggParam.g); i++ {
-		csByteG = append(csByteG, aggParam.g[i].ToBytesS()...)
-		csByteH = append(csByteH, aggParam.h[i].ToBytesS()...)
-	}
-	aggParam.cs = append(aggParam.cs, csByteG...)
-	aggParam.cs = append(aggParam.cs, csByteH...)
-	aggParam.cs = append(aggParam.cs, aggParam.u.ToBytesS()...)
+	aggParam.cs = AggParam.cs
 
 	tmpcmsValue := proof.cmsValue
 	for i := numValue; i < numValuePad; i++ {
@@ -476,7 +459,7 @@ func (proof AggregatedRangeProof) Verify() (bool, error) {
 
 	// recalculate challenge y, z
 	y := generateChallenge([][]byte{aggParam.cs, proof.a.ToBytesS(), proof.s.ToBytesS()})
-	z := generateChallenge([][]byte{aggParam.cs, proof.a.ToBytesS(), proof.s.ToBytesS(), y.ToBytesS()})
+	z := generateChallenge([][]byte{proof.a.ToBytesS(), proof.s.ToBytesS(), y.ToBytesS()})
 
 	zSquare := new(privacy.Scalar).Mul(z, z)
 
@@ -535,7 +518,7 @@ func (proof AggregatedRangeProof) Verify() (bool, error) {
 		return false, errors.New("verify aggregated range proof statement 1 failed")
 	}
 
-	innerProductArgValid := proof.innerProductProof.Verify(aggParam)
+	innerProductArgValid := proof.innerProductProof.Verify(aggParam, z.ToBytesS())
 	if !innerProductArgValid {
 		privacy.Logger.Log.Errorf("verify aggregated range proof statement 2 failed")
 		return false, errors.New("verify aggregated range proof statement 2 failed")
@@ -554,15 +537,7 @@ func (proof AggregatedRangeProof) VerifyFaster() (bool, error) {
 	aggParam.g = AggParam.g[0 : numValuePad*maxExp]
 	aggParam.h = AggParam.h[0 : numValuePad*maxExp]
 	aggParam.u = AggParam.u
-	csByteH := []byte{}
-	csByteG := []byte{}
-	for i := 0; i < len(aggParam.g); i++ {
-		csByteG = append(csByteG, aggParam.g[i].ToBytesS()...)
-		csByteH = append(csByteH, aggParam.h[i].ToBytesS()...)
-	}
-	aggParam.cs = append(aggParam.cs, csByteG...)
-	aggParam.cs = append(aggParam.cs, csByteH...)
-	aggParam.cs = append(aggParam.cs, aggParam.u.ToBytesS()...)
+	aggParam.cs = AggParam.cs
 
 	tmpcmsValue := proof.cmsValue
 
@@ -580,7 +555,7 @@ func (proof AggregatedRangeProof) VerifyFaster() (bool, error) {
 
 	// recalculate challenge y, z
 	y := generateChallenge([][]byte{aggParam.cs, proof.a.ToBytesS(), proof.s.ToBytesS()})
-	z := generateChallenge([][]byte{aggParam.cs, proof.a.ToBytesS(), proof.s.ToBytesS(), y.ToBytesS()})
+	z := generateChallenge([][]byte{proof.a.ToBytesS(), proof.s.ToBytesS(), y.ToBytesS()})
 	zSquare := new(privacy.Scalar).Mul(z, z)
 
 	// challenge x = hash(G || H || A || S || T1 || T2)
@@ -637,7 +612,7 @@ func (proof AggregatedRangeProof) VerifyFaster() (bool, error) {
 		return false, errors.New("verify aggregated range proof statement 1 failed")
 	}
 
-	innerProductArgValid := proof.innerProductProof.VerifyFaster(aggParam)
+	innerProductArgValid := proof.innerProductProof.VerifyFaster(aggParam, z.ToBytesS())
 	if !innerProductArgValid {
 		privacy.Logger.Log.Errorf("verify aggregated range proof statement 2 failed")
 		return false, errors.New("verify aggregated range proof statement 2 failed")

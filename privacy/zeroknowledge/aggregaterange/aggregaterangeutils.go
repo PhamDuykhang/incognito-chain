@@ -2,6 +2,7 @@ package aggregaterange
 
 import (
 	"errors"
+	"github.com/incognitochain/incognito-chain/common"
 	"github.com/incognitochain/incognito-chain/privacy"
 	"math"
 )
@@ -42,15 +43,16 @@ func newBulletproofParams(m int) *bulletproofParams {
 	gen.u = new(privacy.Point)
 	gen.u = privacy.HashToPointFromIndex(int64(numCommitValue + 2*maxOutputNumberParam*maxExp), privacy.CStringBulletProof)
 
-	gen.cs = append(gen.cs, csByteG...)
-	gen.cs = append(gen.cs, csByteH...)
-	gen.cs = append(gen.cs, gen.u.ToBytesS()...)
-
+	tmp := append(gen.cs, csByteG...)
+	tmp = append(tmp, csByteH...)
+	tmp = append(tmp, gen.u.ToBytesS()...)
+	gen.cs = common.HashB(tmp)
 	return gen
 }
 
 func generateChallenge(values [][]byte) *privacy.Scalar {
 	bytes := []byte{}
+	bytes = append(bytes, AggParam.cs...)
 	for i := 0; i < len(values); i++ {
 		bytes = append(bytes, values[i]...)
 	}

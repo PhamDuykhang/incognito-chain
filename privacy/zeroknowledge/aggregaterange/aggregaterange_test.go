@@ -183,22 +183,22 @@ func TestInnerProductProveVerify(t *testing.T) {
 			wit.p.Add(wit.p, new(privacy.Point).ScalarMult(aggParam.h[i], wit.b[i]))
 		}
 
-		proof, err := wit.Prove(aggParam)
+		proof, err := wit.Prove(aggParam, aggParam.cs)
 		if err != nil {
 			fmt.Printf("Err: %v\n", err)
 			return
 		}
-		res2 := proof.Verify(aggParam)
+		res2 := proof.Verify(aggParam, aggParam.cs)
 		assert.Equal(t, true, res2)
-		res2prime := proof.VerifyFaster(aggParam)
+		res2prime := proof.VerifyFaster(aggParam, aggParam.cs)
 		assert.Equal(t, true, res2prime)
 
 		bytes := proof.Bytes()
 		proof2 := new(InnerProductProof)
 		proof2.SetBytes(bytes)
-		res3 := proof2.Verify(aggParam)
+		res3 := proof2.Verify(aggParam, aggParam.cs)
 		assert.Equal(t, true, res3)
-		res3prime := proof2.Verify(aggParam)
+		res3prime := proof2.Verify(aggParam, aggParam.cs)
 		assert.Equal(t, true, res3prime)
 	}
 }

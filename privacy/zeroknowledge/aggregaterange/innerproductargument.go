@@ -98,15 +98,15 @@ func (proof *InnerProductProof) SetBytes(bytes []byte) error {
 	return nil
 }
 
-func (wit InnerProductWitness) Prove(aggParam *bulletproofParams) (*InnerProductProof, error) {
+func (wit InnerProductWitness) Prove(aggParam *bulletproofParams, hashCache []byte) (*InnerProductProof, error) {
 	if len(wit.a) != len(wit.b) {
 		return nil, errors.New("invalid inputs")
 	}
 
-	n := len(wit.a)
+	N := len(wit.a)
 
-	a := make([]*privacy.Scalar, n)
-	b := make([]*privacy.Scalar, n)
+	a := make([]*privacy.Scalar, N)
+	b := make([]*privacy.Scalar, N)
 
 	for i := range wit.a {
 		a[i] = new(privacy.Scalar).Set(wit.a[i])
@@ -114,8 +114,8 @@ func (wit InnerProductWitness) Prove(aggParam *bulletproofParams) (*InnerProduct
 	}
 
 	p := new(privacy.Point).Set(wit.p)
-	G := make([]*privacy.Point, n)
-	H := make([]*privacy.Point, n)
+	G := make([]*privacy.Point, N)
+	H := make([]*privacy.Point, N)
 	for i := range G {
 		G[i] = new(privacy.Point).Set(aggParam.g[i])
 		H[i] = new(privacy.Point).Set(aggParam.h[i])
@@ -126,8 +126,8 @@ func (wit InnerProductWitness) Prove(aggParam *bulletproofParams) (*InnerProduct
 	proof.r = make([]*privacy.Point, 0)
 	proof.p = new(privacy.Point).Set(wit.p)
 
-	for n > 1 {
-		nPrime := n / 2
+	for N > 1 {
+		nPrime := N / 2
 
 		cL, err := innerProduct(a[:nPrime], b[nPrime:])
 		if err != nil {
@@ -153,9 +153,9 @@ func (wit InnerProductWitness) Prove(aggParam *bulletproofParams) (*InnerProduct
 		R.Add(R, new(privacy.Point).ScalarMult(aggParam.u, cR))
 		proof.r = append(proof.r, R)
 
-		// calculate challenge x = hash(G || H || u || x || l || r)
-		x := generateChallenge([][]byte{aggParam.cs, p.ToBytesS(), L.ToBytesS(), R.ToBytesS()})
-		//x := generateChallengeOld(aggParam, [][]byte{p.ToBytesS(), L.ToBytesS(), R.ToBytesS()})
+		x := generateChallenge([][]byte{hashCache, L.ToBytesS(), R.ToBytesS()})
+		hashCache = new(privacy.Scalar).Set(x).ToBytesS()
+
 		xInverse := new(privacy.Scalar).Invert(x)
 		xSquare := new(privacy.Scalar).Mul(x, x)
 		xSquareInverse := new(privacy.Scalar).Mul(xInverse, xInverse)
@@ -190,7 +190,7 @@ func (wit InnerProductWitness) Prove(aggParam *bulletproofParams) (*InnerProduct
 		p.Set(PPrime)
 		G = GPrime
 		H = HPrime
-		n = nPrime
+		N = nPrime
 	}
 
 	proof.a = new(privacy.Scalar).Set(a[0])
@@ -198,7 +198,7 @@ func (wit InnerProductWitness) Prove(aggParam *bulletproofParams) (*InnerProduct
 
 	return proof, nil
 }
-func (proof InnerProductProof) Verify(aggParam *bulletproofParams) bool {
+func (proof InnerProductProof) Verify(aggParam *bulletproofParams, hashCache []byte) bool {
 	//var aggParam = newBulletproofParams(1)
 	p := new(privacy.Point)
 	p.Set(proof.p)
@@ -214,7 +214,8 @@ func (proof InnerProductProof) Verify(aggParam *bulletproofParams) bool {
 	for i := range proof.l {
 		nPrime := n / 2
 		// calculate challenge x = hash(G || H || u || p || x || l || r)
-		x := generateChallenge([][]byte{aggParam.cs, p.ToBytesS(), proof.l[i].ToBytesS(), proof.r[i].ToBytesS()})
+		x := generateChallenge([][]byte{hashCache, proof.l[i].ToBytesS(), proof.r[i].ToBytesS()})
+		hashCache = new(privacy.Scalar).Set(x).ToBytesS()
 		xInverse := new(privacy.Scalar).Invert(x)
 		xSquare := new(privacy.Scalar).Mul(x, x)
 		xSquareInverse := new(privacy.Scalar).Mul(xInverse, xInverse)
@@ -250,7 +251,7 @@ func (proof InnerProductProof) Verify(aggParam *bulletproofParams) bool {
 	return res
 }
 
-func (proof InnerProductProof) VerifyFaster(aggParam *bulletproofParams) bool {
+func (proof InnerProductProof) VerifyFaster(aggParam *bulletproofParams, hashCache []byte) bool {
 	//var aggParam = newBulletproofParams(1)
 	p := new(privacy.Point)
 	p.Set(proof.p)
@@ -276,7 +277,9 @@ func (proof InnerProductProof) VerifyFaster(aggParam *bulletproofParams) bool {
 
 	for i := range proof.l {
 		// calculate challenge x = hash(hash(G || H || u || p) || x || l || r)
-		xList[i] = generateChallenge([][]byte{aggParam.cs, p.ToBytesS(), proof.l[i].ToBytesS(), proof.r[i].ToBytesS()})
+		xList[i] = generateChallenge([][]byte{hashCache, proof.l[i].ToBytesS(), proof.r[i].ToBytesS()})
+		hashCache = new(privacy.Scalar).Set(xList[i]).ToBytesS()
+
 		xInverseList[i] = new(privacy.Scalar).Invert(xList[i])
 		xSquareList[i] = new(privacy.Scalar).Mul(xList[i], xList[i])
 		xInverseSquare_List[i] = new(privacy.Scalar).Mul(xInverseList[i], xInverseList[i])
@@ -291,9 +294,6 @@ func (proof InnerProductProof) VerifyFaster(aggParam *bulletproofParams) bool {
 				sInverse[j] = new(privacy.Scalar).Mul(sInverse[j], xList[i])
 			}
 		}
-		PPrime := new(privacy.Point).AddPedersen(xSquareList[i], proof.l[i], xInverseSquare_List[i], proof.r[i])
-		PPrime.Add(PPrime, p)
-		p = PPrime
 	}
 
 	// Compute (g^s)^a (h^-s)^b u^(ab) = p l^(x^2) r^(-x^2)
