@@ -238,8 +238,8 @@ func (blockchain *BlockChain) InsertShardBlock(shardBlock *ShardBlock, isValidat
 	if shardBlock.GetHeight() == 2 {
 		timeSync[shardBlock.Header.ShardID] = time.Now()
 	}
-	if shardBlock.GetHeight() == 100000 {
-		Logger.log.Infof("[synctime] Time for sync 2->100000 block shard %v: %v", shardBlock.Header.ShardID, time.Since(timeSync[shardBlock.Header.ShardID]))
+	if shardBlock.GetHeight() == 50000 {
+		Logger.log.Infof("[synctime] Time for sync 2->50000 block shard %v: %v", shardBlock.Header.ShardID, time.Since(timeSync[shardBlock.Header.ShardID]))
 	}
 	return nil
 }
