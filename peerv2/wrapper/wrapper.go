@@ -3,7 +3,6 @@ package wrapper
 import (
 	"encoding/json"
 	"runtime"
-	"time"
 
 	"github.com/incognitochain/incognito-chain/common"
 	"github.com/klauspost/compress/zstd"
@@ -19,7 +18,7 @@ func init() {
 
 // EnCom: encode an interface{} to bytes and compress to shorted bytes slice
 func EnCom(data interface{}) ([]byte, error) {
-	s := time.Now()
+	//s := time.Now()
 	// var buf bytes.Buffer
 	// e := gob.NewEncoder(&buf)
 	// err := e.Encode(data)
@@ -28,7 +27,7 @@ func EnCom(data interface{}) ([]byte, error) {
 		return nil, err
 	}
 	//Logger.Infof("[stream] Time Encode %v", time.Since(s).Seconds())
-	s = time.Now()
+	//	s = time.Now()
 	// compresser, err := zstd.NewWriter(nil, zstd.WithEncoderLevel(zstd.SpeedBestCompression))
 	// if err != nil {
 	// 	return nil, err
@@ -58,13 +57,13 @@ func DeCom(data []byte, out interface{}) error {
 
 // EnCom: encode an interface{} to bytes and compress to shorted bytes slice
 func OldEnCom(data interface{}) ([]byte, error) {
-	s := time.Now()
+	//	s := time.Now()
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
 		return nil, err
 	}
 	//Logger.Infof("[stream] Time Encode %v", time.Since(s).Seconds())
-	s = time.Now()
+	//	s = time.Now()
 	messageBytes, err := common.GZipFromBytes(jsonBytes)
 	//Logger.Infof("[stream] Time Compress %v", time.Since(s).Seconds())
 	//Logger.Infof("[stream] Time %v, Len encode %v len compress %v Ratio %v", time.Since(s).Seconds(), len(jsonBytes), len(messageBytes), float64(len(jsonBytes))/float64(len(messageBytes)))
