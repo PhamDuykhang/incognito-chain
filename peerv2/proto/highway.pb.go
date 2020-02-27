@@ -6,11 +6,12 @@ package proto
 import (
 	context "context"
 	fmt "fmt"
+	math "math"
+
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -23,6 +24,37 @@ var _ = math.Inf
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
+
+type BlkType int32
+
+const (
+	BlkType_BlkShard  BlkType = 0
+	BlkType_BlkXShard BlkType = 1
+	BlkType_BlkS2B    BlkType = 2
+	BlkType_BlkBc     BlkType = 3
+)
+
+var BlkType_name = map[int32]string{
+	0: "BlkShard",
+	1: "BlkXShard",
+	2: "BlkS2B",
+	3: "BlkBc",
+}
+
+var BlkType_value = map[string]int32{
+	"BlkShard":  0,
+	"BlkXShard": 1,
+	"BlkS2B":    2,
+	"BlkBc":     3,
+}
+
+func (x BlkType) String() string {
+	return proto.EnumName(BlkType_name, int32(x))
+}
+
+func (BlkType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_a48762df9e8cc53a, []int{0}
+}
 
 type MessageTopicPair_Action int32
 
@@ -58,6 +90,7 @@ type RegisterRequest struct {
 	CommitteeID          []byte   `protobuf:"bytes,3,opt,name=CommitteeID,proto3" json:"CommitteeID,omitempty"`
 	PeerID               string   `protobuf:"bytes,4,opt,name=PeerID,proto3" json:"PeerID,omitempty"`
 	Role                 string   `protobuf:"bytes,5,opt,name=Role,proto3" json:"Role,omitempty"`
+	UUID                 string   `protobuf:"bytes,6,opt,name=UUID,proto3" json:"UUID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -119,6 +152,13 @@ func (m *RegisterRequest) GetPeerID() string {
 func (m *RegisterRequest) GetRole() string {
 	if m != nil {
 		return m.Role
+	}
+	return ""
+}
+
+func (m *RegisterRequest) GetUUID() string {
+	if m != nil {
+		return m.UUID
 	}
 	return ""
 }
@@ -288,6 +328,7 @@ type GetBlockShardByHeightRequest struct {
 	Heights              []uint64 `protobuf:"varint,5,rep,packed,name=Heights,proto3" json:"Heights,omitempty"`
 	FromPool             bool     `protobuf:"varint,6,opt,name=FromPool,proto3" json:"FromPool,omitempty"`
 	CallDepth            int32    `protobuf:"varint,7,opt,name=CallDepth,proto3" json:"CallDepth,omitempty"`
+	UUID                 string   `protobuf:"bytes,8,opt,name=UUID,proto3" json:"UUID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -367,6 +408,13 @@ func (m *GetBlockShardByHeightRequest) GetCallDepth() int32 {
 	return 0
 }
 
+func (m *GetBlockShardByHeightRequest) GetUUID() string {
+	if m != nil {
+		return m.UUID
+	}
+	return ""
+}
+
 type GetBlockShardByHeightResponse struct {
 	Data                 [][]byte `protobuf:"bytes,1,rep,name=Data,proto3" json:"Data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -410,6 +458,7 @@ type GetBlockShardByHashRequest struct {
 	Shard                int32    `protobuf:"varint,1,opt,name=Shard,proto3" json:"Shard,omitempty"`
 	Hashes               [][]byte `protobuf:"bytes,2,rep,name=Hashes,proto3" json:"Hashes,omitempty"`
 	CallDepth            int32    `protobuf:"varint,3,opt,name=CallDepth,proto3" json:"CallDepth,omitempty"`
+	UUID                 string   `protobuf:"bytes,4,opt,name=UUID,proto3" json:"UUID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -461,6 +510,13 @@ func (m *GetBlockShardByHashRequest) GetCallDepth() int32 {
 	return 0
 }
 
+func (m *GetBlockShardByHashRequest) GetUUID() string {
+	if m != nil {
+		return m.UUID
+	}
+	return ""
+}
+
 type GetBlockShardByHashResponse struct {
 	Data                 [][]byte `protobuf:"bytes,1,rep,name=Data,proto3" json:"Data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -507,6 +563,7 @@ type GetBlockBeaconByHeightRequest struct {
 	Heights              []uint64 `protobuf:"varint,4,rep,packed,name=Heights,proto3" json:"Heights,omitempty"`
 	FromPool             bool     `protobuf:"varint,5,opt,name=FromPool,proto3" json:"FromPool,omitempty"`
 	CallDepth            int32    `protobuf:"varint,6,opt,name=CallDepth,proto3" json:"CallDepth,omitempty"`
+	UUID                 string   `protobuf:"bytes,7,opt,name=UUID,proto3" json:"UUID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -579,6 +636,13 @@ func (m *GetBlockBeaconByHeightRequest) GetCallDepth() int32 {
 	return 0
 }
 
+func (m *GetBlockBeaconByHeightRequest) GetUUID() string {
+	if m != nil {
+		return m.UUID
+	}
+	return ""
+}
+
 type GetBlockBeaconByHeightResponse struct {
 	Data                 [][]byte `protobuf:"bytes,1,rep,name=Data,proto3" json:"Data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -621,6 +685,7 @@ func (m *GetBlockBeaconByHeightResponse) GetData() [][]byte {
 type GetBlockBeaconByHashRequest struct {
 	Hashes               [][]byte `protobuf:"bytes,1,rep,name=Hashes,proto3" json:"Hashes,omitempty"`
 	CallDepth            int32    `protobuf:"varint,2,opt,name=CallDepth,proto3" json:"CallDepth,omitempty"`
+	UUID                 string   `protobuf:"bytes,3,opt,name=UUID,proto3" json:"UUID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -663,6 +728,13 @@ func (m *GetBlockBeaconByHashRequest) GetCallDepth() int32 {
 		return m.CallDepth
 	}
 	return 0
+}
+
+func (m *GetBlockBeaconByHashRequest) GetUUID() string {
+	if m != nil {
+		return m.UUID
+	}
+	return ""
 }
 
 type GetBlockBeaconByHashResponse struct {
@@ -713,6 +785,7 @@ type GetBlockCrossShardByHeightRequest struct {
 	Heights              []uint64 `protobuf:"varint,6,rep,packed,name=Heights,proto3" json:"Heights,omitempty"`
 	FromPool             bool     `protobuf:"varint,7,opt,name=FromPool,proto3" json:"FromPool,omitempty"`
 	CallDepth            int32    `protobuf:"varint,8,opt,name=CallDepth,proto3" json:"CallDepth,omitempty"`
+	UUID                 string   `protobuf:"bytes,9,opt,name=UUID,proto3" json:"UUID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -799,6 +872,13 @@ func (m *GetBlockCrossShardByHeightRequest) GetCallDepth() int32 {
 	return 0
 }
 
+func (m *GetBlockCrossShardByHeightRequest) GetUUID() string {
+	if m != nil {
+		return m.UUID
+	}
+	return ""
+}
+
 type GetBlockCrossShardByHeightResponse struct {
 	Data                 [][]byte `protobuf:"bytes,1,rep,name=Data,proto3" json:"Data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -846,6 +926,7 @@ type GetBlockShardToBeaconByHeightRequest struct {
 	Heights              []uint64 `protobuf:"varint,5,rep,packed,name=Heights,proto3" json:"Heights,omitempty"`
 	FromPool             bool     `protobuf:"varint,6,opt,name=FromPool,proto3" json:"FromPool,omitempty"`
 	CallDepth            int32    `protobuf:"varint,7,opt,name=CallDepth,proto3" json:"CallDepth,omitempty"`
+	UUID                 string   `protobuf:"bytes,8,opt,name=UUID,proto3" json:"UUID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -925,6 +1006,13 @@ func (m *GetBlockShardToBeaconByHeightRequest) GetCallDepth() int32 {
 	return 0
 }
 
+func (m *GetBlockShardToBeaconByHeightRequest) GetUUID() string {
+	if m != nil {
+		return m.UUID
+	}
+	return ""
+}
+
 type GetBlockShardToBeaconByHeightResponse struct {
 	Data                 [][]byte `protobuf:"bytes,1,rep,name=Data,proto3" json:"Data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -969,6 +1057,7 @@ type GetBlockCrossShardByHashRequest struct {
 	ToShard              int32    `protobuf:"varint,2,opt,name=ToShard,proto3" json:"ToShard,omitempty"`
 	Hashes               [][]byte `protobuf:"bytes,3,rep,name=Hashes,proto3" json:"Hashes,omitempty"`
 	CallDepth            int32    `protobuf:"varint,4,opt,name=CallDepth,proto3" json:"CallDepth,omitempty"`
+	UUID                 string   `protobuf:"bytes,5,opt,name=UUID,proto3" json:"UUID,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -1027,6 +1116,13 @@ func (m *GetBlockCrossShardByHashRequest) GetCallDepth() int32 {
 	return 0
 }
 
+func (m *GetBlockCrossShardByHashRequest) GetUUID() string {
+	if m != nil {
+		return m.UUID
+	}
+	return ""
+}
+
 type GetBlockCrossShardByHashResponse struct {
 	Data                 [][]byte `protobuf:"bytes,1,rep,name=Data,proto3" json:"Data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -1066,6 +1162,258 @@ func (m *GetBlockCrossShardByHashResponse) GetData() [][]byte {
 	return nil
 }
 
+type BlockByHeightRequest struct {
+	Type                 BlkType  `protobuf:"varint,1,opt,name=Type,proto3,enum=BlkType" json:"Type,omitempty"`
+	Specific             bool     `protobuf:"varint,2,opt,name=Specific,proto3" json:"Specific,omitempty"`
+	Heights              []uint64 `protobuf:"varint,3,rep,packed,name=Heights,proto3" json:"Heights,omitempty"`
+	From                 int32    `protobuf:"varint,4,opt,name=From,proto3" json:"From,omitempty"`
+	To                   int32    `protobuf:"varint,5,opt,name=To,proto3" json:"To,omitempty"`
+	CallDepth            int32    `protobuf:"varint,6,opt,name=CallDepth,proto3" json:"CallDepth,omitempty"`
+	UUID                 string   `protobuf:"bytes,7,opt,name=UUID,proto3" json:"UUID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *BlockByHeightRequest) Reset()         { *m = BlockByHeightRequest{} }
+func (m *BlockByHeightRequest) String() string { return proto.CompactTextString(m) }
+func (*BlockByHeightRequest) ProtoMessage()    {}
+func (*BlockByHeightRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a48762df9e8cc53a, []int{18}
+}
+
+func (m *BlockByHeightRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BlockByHeightRequest.Unmarshal(m, b)
+}
+func (m *BlockByHeightRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BlockByHeightRequest.Marshal(b, m, deterministic)
+}
+func (m *BlockByHeightRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BlockByHeightRequest.Merge(m, src)
+}
+func (m *BlockByHeightRequest) XXX_Size() int {
+	return xxx_messageInfo_BlockByHeightRequest.Size(m)
+}
+func (m *BlockByHeightRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_BlockByHeightRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BlockByHeightRequest proto.InternalMessageInfo
+
+func (m *BlockByHeightRequest) GetType() BlkType {
+	if m != nil {
+		return m.Type
+	}
+	return BlkType_BlkShard
+}
+
+func (m *BlockByHeightRequest) GetSpecific() bool {
+	if m != nil {
+		return m.Specific
+	}
+	return false
+}
+
+func (m *BlockByHeightRequest) GetHeights() []uint64 {
+	if m != nil {
+		return m.Heights
+	}
+	return nil
+}
+
+func (m *BlockByHeightRequest) GetFrom() int32 {
+	if m != nil {
+		return m.From
+	}
+	return 0
+}
+
+func (m *BlockByHeightRequest) GetTo() int32 {
+	if m != nil {
+		return m.To
+	}
+	return 0
+}
+
+func (m *BlockByHeightRequest) GetCallDepth() int32 {
+	if m != nil {
+		return m.CallDepth
+	}
+	return 0
+}
+
+func (m *BlockByHeightRequest) GetUUID() string {
+	if m != nil {
+		return m.UUID
+	}
+	return ""
+}
+
+type BlockBeaconByHeightRequest struct {
+	Specific             bool     `protobuf:"varint,1,opt,name=Specific,proto3" json:"Specific,omitempty"`
+	FromHeight           uint64   `protobuf:"varint,2,opt,name=FromHeight,proto3" json:"FromHeight,omitempty"`
+	ToHeight             uint64   `protobuf:"varint,3,opt,name=ToHeight,proto3" json:"ToHeight,omitempty"`
+	Heights              []uint64 `protobuf:"varint,4,rep,packed,name=Heights,proto3" json:"Heights,omitempty"`
+	FromPool             bool     `protobuf:"varint,5,opt,name=FromPool,proto3" json:"FromPool,omitempty"`
+	CallDepth            int32    `protobuf:"varint,6,opt,name=CallDepth,proto3" json:"CallDepth,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *BlockBeaconByHeightRequest) Reset()         { *m = BlockBeaconByHeightRequest{} }
+func (m *BlockBeaconByHeightRequest) String() string { return proto.CompactTextString(m) }
+func (*BlockBeaconByHeightRequest) ProtoMessage()    {}
+func (*BlockBeaconByHeightRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a48762df9e8cc53a, []int{19}
+}
+
+func (m *BlockBeaconByHeightRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BlockBeaconByHeightRequest.Unmarshal(m, b)
+}
+func (m *BlockBeaconByHeightRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BlockBeaconByHeightRequest.Marshal(b, m, deterministic)
+}
+func (m *BlockBeaconByHeightRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BlockBeaconByHeightRequest.Merge(m, src)
+}
+func (m *BlockBeaconByHeightRequest) XXX_Size() int {
+	return xxx_messageInfo_BlockBeaconByHeightRequest.Size(m)
+}
+func (m *BlockBeaconByHeightRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_BlockBeaconByHeightRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BlockBeaconByHeightRequest proto.InternalMessageInfo
+
+func (m *BlockBeaconByHeightRequest) GetSpecific() bool {
+	if m != nil {
+		return m.Specific
+	}
+	return false
+}
+
+func (m *BlockBeaconByHeightRequest) GetFromHeight() uint64 {
+	if m != nil {
+		return m.FromHeight
+	}
+	return 0
+}
+
+func (m *BlockBeaconByHeightRequest) GetToHeight() uint64 {
+	if m != nil {
+		return m.ToHeight
+	}
+	return 0
+}
+
+func (m *BlockBeaconByHeightRequest) GetHeights() []uint64 {
+	if m != nil {
+		return m.Heights
+	}
+	return nil
+}
+
+func (m *BlockBeaconByHeightRequest) GetFromPool() bool {
+	if m != nil {
+		return m.FromPool
+	}
+	return false
+}
+
+func (m *BlockBeaconByHeightRequest) GetCallDepth() int32 {
+	if m != nil {
+		return m.CallDepth
+	}
+	return 0
+}
+
+type BlockBeaconByHashRequest struct {
+	Hashes               [][]byte `protobuf:"bytes,1,rep,name=Hashes,proto3" json:"Hashes,omitempty"`
+	CallDepth            int32    `protobuf:"varint,2,opt,name=CallDepth,proto3" json:"CallDepth,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *BlockBeaconByHashRequest) Reset()         { *m = BlockBeaconByHashRequest{} }
+func (m *BlockBeaconByHashRequest) String() string { return proto.CompactTextString(m) }
+func (*BlockBeaconByHashRequest) ProtoMessage()    {}
+func (*BlockBeaconByHashRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a48762df9e8cc53a, []int{20}
+}
+
+func (m *BlockBeaconByHashRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BlockBeaconByHashRequest.Unmarshal(m, b)
+}
+func (m *BlockBeaconByHashRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BlockBeaconByHashRequest.Marshal(b, m, deterministic)
+}
+func (m *BlockBeaconByHashRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BlockBeaconByHashRequest.Merge(m, src)
+}
+func (m *BlockBeaconByHashRequest) XXX_Size() int {
+	return xxx_messageInfo_BlockBeaconByHashRequest.Size(m)
+}
+func (m *BlockBeaconByHashRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_BlockBeaconByHashRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BlockBeaconByHashRequest proto.InternalMessageInfo
+
+func (m *BlockBeaconByHashRequest) GetHashes() [][]byte {
+	if m != nil {
+		return m.Hashes
+	}
+	return nil
+}
+
+func (m *BlockBeaconByHashRequest) GetCallDepth() int32 {
+	if m != nil {
+		return m.CallDepth
+	}
+	return 0
+}
+
+type BlockData struct {
+	Data                 []byte   `protobuf:"bytes,1,opt,name=Data,proto3" json:"Data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *BlockData) Reset()         { *m = BlockData{} }
+func (m *BlockData) String() string { return proto.CompactTextString(m) }
+func (*BlockData) ProtoMessage()    {}
+func (*BlockData) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a48762df9e8cc53a, []int{21}
+}
+
+func (m *BlockData) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BlockData.Unmarshal(m, b)
+}
+func (m *BlockData) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BlockData.Marshal(b, m, deterministic)
+}
+func (m *BlockData) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BlockData.Merge(m, src)
+}
+func (m *BlockData) XXX_Size() int {
+	return xxx_messageInfo_BlockData.Size(m)
+}
+func (m *BlockData) XXX_DiscardUnknown() {
+	xxx_messageInfo_BlockData.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BlockData proto.InternalMessageInfo
+
+func (m *BlockData) GetData() []byte {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
 type GetChainCommitteeRequest struct {
 	Epoch                int32    `protobuf:"varint,1,opt,name=Epoch,proto3" json:"Epoch,omitempty"`
 	CommitteeID          int32    `protobuf:"varint,2,opt,name=CommitteeID,proto3" json:"CommitteeID,omitempty"`
@@ -1078,7 +1426,7 @@ func (m *GetChainCommitteeRequest) Reset()         { *m = GetChainCommitteeReque
 func (m *GetChainCommitteeRequest) String() string { return proto.CompactTextString(m) }
 func (*GetChainCommitteeRequest) ProtoMessage()    {}
 func (*GetChainCommitteeRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a48762df9e8cc53a, []int{18}
+	return fileDescriptor_a48762df9e8cc53a, []int{22}
 }
 
 func (m *GetChainCommitteeRequest) XXX_Unmarshal(b []byte) error {
@@ -1124,7 +1472,7 @@ func (m *GetChainCommitteeResponse) Reset()         { *m = GetChainCommitteeResp
 func (m *GetChainCommitteeResponse) String() string { return proto.CompactTextString(m) }
 func (*GetChainCommitteeResponse) ProtoMessage()    {}
 func (*GetChainCommitteeResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a48762df9e8cc53a, []int{19}
+	return fileDescriptor_a48762df9e8cc53a, []int{23}
 }
 
 func (m *GetChainCommitteeResponse) XXX_Unmarshal(b []byte) error {
@@ -1162,7 +1510,7 @@ func (m *GetHighwayInfosRequest) Reset()         { *m = GetHighwayInfosRequest{}
 func (m *GetHighwayInfosRequest) String() string { return proto.CompactTextString(m) }
 func (*GetHighwayInfosRequest) ProtoMessage()    {}
 func (*GetHighwayInfosRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a48762df9e8cc53a, []int{20}
+	return fileDescriptor_a48762df9e8cc53a, []int{24}
 }
 
 func (m *GetHighwayInfosRequest) XXX_Unmarshal(b []byte) error {
@@ -1195,7 +1543,7 @@ func (m *HighwayInfo) Reset()         { *m = HighwayInfo{} }
 func (m *HighwayInfo) String() string { return proto.CompactTextString(m) }
 func (*HighwayInfo) ProtoMessage()    {}
 func (*HighwayInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a48762df9e8cc53a, []int{21}
+	return fileDescriptor_a48762df9e8cc53a, []int{25}
 }
 
 func (m *HighwayInfo) XXX_Unmarshal(b []byte) error {
@@ -1241,7 +1589,7 @@ func (m *GetHighwayInfosResponse) Reset()         { *m = GetHighwayInfosResponse
 func (m *GetHighwayInfosResponse) String() string { return proto.CompactTextString(m) }
 func (*GetHighwayInfosResponse) ProtoMessage()    {}
 func (*GetHighwayInfosResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a48762df9e8cc53a, []int{22}
+	return fileDescriptor_a48762df9e8cc53a, []int{26}
 }
 
 func (m *GetHighwayInfosResponse) XXX_Unmarshal(b []byte) error {
@@ -1270,6 +1618,7 @@ func (m *GetHighwayInfosResponse) GetHighways() []*HighwayInfo {
 }
 
 func init() {
+	proto.RegisterEnum("BlkType", BlkType_name, BlkType_value)
 	proto.RegisterEnum("MessageTopicPair_Action", MessageTopicPair_Action_name, MessageTopicPair_Action_value)
 	proto.RegisterType((*RegisterRequest)(nil), "RegisterRequest")
 	proto.RegisterType((*UserRole)(nil), "UserRole")
@@ -1289,6 +1638,10 @@ func init() {
 	proto.RegisterType((*GetBlockShardToBeaconByHeightResponse)(nil), "GetBlockShardToBeaconByHeightResponse")
 	proto.RegisterType((*GetBlockCrossShardByHashRequest)(nil), "GetBlockCrossShardByHashRequest")
 	proto.RegisterType((*GetBlockCrossShardByHashResponse)(nil), "GetBlockCrossShardByHashResponse")
+	proto.RegisterType((*BlockByHeightRequest)(nil), "BlockByHeightRequest")
+	proto.RegisterType((*BlockBeaconByHeightRequest)(nil), "BlockBeaconByHeightRequest")
+	proto.RegisterType((*BlockBeaconByHashRequest)(nil), "BlockBeaconByHashRequest")
+	proto.RegisterType((*BlockData)(nil), "BlockData")
 	proto.RegisterType((*GetChainCommitteeRequest)(nil), "GetChainCommitteeRequest")
 	proto.RegisterType((*GetChainCommitteeResponse)(nil), "GetChainCommitteeResponse")
 	proto.RegisterType((*GetHighwayInfosRequest)(nil), "GetHighwayInfosRequest")
@@ -1299,70 +1652,72 @@ func init() {
 func init() { proto.RegisterFile("highway.proto", fileDescriptor_a48762df9e8cc53a) }
 
 var fileDescriptor_a48762df9e8cc53a = []byte{
-	// 997 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x57, 0xdd, 0x72, 0xdb, 0x44,
-	0x14, 0x96, 0x2c, 0xf9, 0xef, 0x24, 0x4d, 0x9d, 0x43, 0x49, 0x54, 0xd5, 0x49, 0xdd, 0xa5, 0xc9,
-	0x78, 0xb8, 0x58, 0xa6, 0x2e, 0xc3, 0x30, 0xc3, 0x55, 0xed, 0xd0, 0x34, 0x50, 0x06, 0x8f, 0x1c,
-	0x0f, 0x1d, 0xb8, 0x52, 0xd5, 0x8d, 0xad, 0xc1, 0xf1, 0x1a, 0x49, 0x81, 0xc9, 0x13, 0x70, 0xc9,
-	0x1d, 0xaf, 0xc1, 0x25, 0x0f, 0xc1, 0x4b, 0x30, 0xc3, 0x0b, 0xf0, 0x08, 0x8c, 0x56, 0xbf, 0x96,
-	0xa5, 0x75, 0x86, 0xbb, 0x5e, 0x59, 0xe7, 0xec, 0xdf, 0xb7, 0xdf, 0xb7, 0xe7, 0xc7, 0x70, 0x6f,
-	0xee, 0xce, 0xe6, 0xbf, 0xd8, 0xb7, 0x74, 0xe5, 0xf1, 0x80, 0x93, 0x3f, 0x55, 0xb8, 0x6f, 0xb1,
-	0x99, 0xeb, 0x07, 0xcc, 0xb3, 0xd8, 0x4f, 0x37, 0xcc, 0x0f, 0x90, 0x02, 0x8e, 0xf8, 0xf5, 0xb5,
-	0x1b, 0x04, 0x8c, 0x8d, 0x6f, 0xde, 0x2e, 0x5c, 0xe7, 0x6b, 0x76, 0x6b, 0xa8, 0x3d, 0xb5, 0xdf,
-	0xb6, 0x4a, 0x46, 0xf0, 0x14, 0xf6, 0xbe, 0xb3, 0x97, 0x01, 0x7b, 0xf7, 0x0d, 0xf3, 0x7d, 0x7b,
-	0xc6, 0x7c, 0xa3, 0xd6, 0xd3, 0xfa, 0x6d, 0xab, 0xe0, 0xc5, 0x1e, 0xec, 0xa4, 0xab, 0x2f, 0xce,
-	0x0c, 0xad, 0xa7, 0xf6, 0x77, 0xad, 0xbc, 0x0b, 0x0f, 0xa0, 0x31, 0x66, 0xcc, 0xbb, 0x38, 0x33,
-	0x74, 0x71, 0x5a, 0x6c, 0x21, 0x82, 0x6e, 0xf1, 0x05, 0x33, 0xea, 0xc2, 0x2b, 0xbe, 0xc9, 0x57,
-	0xd0, 0x9a, 0xfa, 0xcc, 0x0b, 0xbf, 0xf1, 0x01, 0xd4, 0x5f, 0xdb, 0xb7, 0xcc, 0x8b, 0x41, 0x46,
-	0x46, 0xba, 0xaa, 0x96, 0xad, 0x0a, 0x67, 0x4e, 0xe6, 0xb6, 0xf7, 0x4e, 0x9c, 0x5e, 0xb7, 0x22,
-	0x83, 0xbc, 0x81, 0x4e, 0x46, 0x82, 0xbf, 0xe2, 0x4b, 0x9f, 0xe1, 0x09, 0xe8, 0x63, 0xdb, 0x0d,
-	0xb7, 0xd4, 0xfa, 0x3b, 0x83, 0x7d, 0x1a, 0x5f, 0xe3, 0x92, 0xaf, 0x5c, 0x27, 0x1c, 0xb0, 0xc4,
-	0x30, 0x1e, 0xe5, 0x0e, 0xd9, 0x19, 0xb4, 0x69, 0x82, 0x29, 0x46, 0xf9, 0xbb, 0x0a, 0x9d, 0xe2,
-	0x4a, 0x34, 0xa0, 0x19, 0xfb, 0x62, 0xc0, 0x89, 0x19, 0xc2, 0x13, 0xd3, 0x62, 0x06, 0x23, 0x03,
-	0x3f, 0x06, 0xed, 0x85, 0x13, 0x18, 0x5a, 0x4f, 0xeb, 0xef, 0x0d, 0x8c, 0x0d, 0x24, 0xf4, 0x85,
-	0x13, 0xb8, 0x7c, 0x69, 0x85, 0x93, 0xc8, 0x29, 0x34, 0x22, 0x13, 0x01, 0x1a, 0xe3, 0xe9, 0x70,
-	0x32, 0x1d, 0x76, 0x14, 0x6c, 0x82, 0x36, 0x9e, 0x0e, 0x3b, 0x6a, 0xf8, 0x11, 0x7a, 0x6a, 0xe4,
-	0x6f, 0x15, 0xba, 0xe7, 0x2c, 0x18, 0x2e, 0xb8, 0xf3, 0xa3, 0x20, 0x61, 0x78, 0xfb, 0x8a, 0xb9,
-	0xb3, 0x79, 0x90, 0xbc, 0x82, 0x94, 0x29, 0x35, 0xc7, 0x14, 0x9a, 0xd0, 0x9a, 0xac, 0x98, 0xe3,
-	0x5e, 0x09, 0x8c, 0x6a, 0xbf, 0x65, 0xa5, 0x36, 0x1e, 0x03, 0xbc, 0xf4, 0xf8, 0x75, 0xb4, 0x8d,
-	0x20, 0x58, 0xb7, 0x72, 0x9e, 0x70, 0xed, 0x25, 0x8f, 0x47, 0x75, 0x31, 0x9a, 0xda, 0x21, 0x25,
-	0xd1, 0x97, 0x6f, 0xd4, 0x7b, 0x5a, 0x5f, 0xb7, 0x12, 0x33, 0x5c, 0x15, 0xee, 0x31, 0xe6, 0x7c,
-	0x61, 0x34, 0xa2, 0x13, 0x13, 0x1b, 0xbb, 0xd0, 0x1e, 0xd9, 0x8b, 0xc5, 0x19, 0x5b, 0x05, 0x73,
-	0xa3, 0x29, 0x70, 0x66, 0x0e, 0xf2, 0x1c, 0x8e, 0x2a, 0x6e, 0x18, 0x4b, 0x8c, 0xa0, 0x9f, 0xd9,
-	0x81, 0x2d, 0x24, 0xde, 0xb5, 0xc4, 0x37, 0x99, 0x83, 0x59, 0x5c, 0x64, 0xfb, 0x73, 0x39, 0x29,
-	0x07, 0xd0, 0x08, 0x27, 0xc5, 0x0f, 0x7f, 0xd7, 0x8a, 0xad, 0x75, 0x78, 0x5a, 0x11, 0xde, 0x33,
-	0x78, 0x54, 0x7a, 0x92, 0x04, 0xdc, 0x5f, 0x6a, 0x76, 0xa5, 0x21, 0xb3, 0x1d, 0xbe, 0x2c, 0xaa,
-	0x96, 0xd7, 0x47, 0x95, 0xea, 0x53, 0x93, 0xea, 0xa3, 0x55, 0xeb, 0xa3, 0x57, 0xeb, 0x53, 0x97,
-	0xe9, 0xd3, 0x28, 0x12, 0xf0, 0x29, 0x1c, 0x57, 0x5d, 0x46, 0xc2, 0xc1, 0x24, 0xa3, 0x2d, 0x5d,
-	0x95, 0x53, 0x28, 0xd3, 0x42, 0xad, 0xd6, 0xa2, 0x56, 0x84, 0x32, 0xc8, 0x82, 0x61, 0x7d, 0x53,
-	0x09, 0x90, 0x5f, 0x6b, 0xf0, 0x24, 0x59, 0x34, 0xf2, 0xb8, 0xef, 0x97, 0x86, 0x51, 0x17, 0xda,
-	0x21, 0x1d, 0xf9, 0x57, 0x93, 0x39, 0x42, 0x5a, 0x2f, 0x79, 0x34, 0x16, 0x61, 0x4a, 0xcc, 0x35,
-	0x21, 0x35, 0xa9, 0x90, 0xba, 0x54, 0xc8, 0x7a, 0xb5, 0x90, 0x8d, 0x6a, 0x21, 0x9b, 0x32, 0x21,
-	0x5b, 0x45, 0xf6, 0x3e, 0x07, 0x22, 0x23, 0x42, 0xc2, 0xe1, 0xbf, 0x2a, 0x3c, 0x5d, 0x0b, 0x82,
-	0x4b, 0x5e, 0xfe, 0xae, 0xe5, 0x34, 0xbe, 0x4f, 0x59, 0xe9, 0x0b, 0x38, 0xd9, 0x72, 0x63, 0x09,
-	0x5f, 0xbf, 0xa9, 0xf0, 0xb8, 0x94, 0xea, 0x5c, 0x04, 0xfc, 0xdf, 0x17, 0x97, 0x45, 0x8e, 0x56,
-	0x1d, 0x39, 0x7a, 0xf1, 0x3a, 0x9f, 0x41, 0xaf, 0x1a, 0x90, 0xe4, 0x26, 0x16, 0x18, 0xe7, 0x2c,
-	0x18, 0xcd, 0x6d, 0x77, 0x99, 0x76, 0x00, 0xb9, 0x2c, 0xfb, 0xe5, 0x8a, 0x3b, 0xf3, 0x24, 0xcb,
-	0x0a, 0xa3, 0xd8, 0x3e, 0x44, 0xe8, 0xf3, 0x2e, 0xf2, 0x09, 0x3c, 0x2c, 0xd9, 0x73, 0x03, 0x84,
-	0x9a, 0x82, 0x30, 0xe0, 0xe0, 0x9c, 0x05, 0xaf, 0xa2, 0x8e, 0xe8, 0x62, 0x79, 0xc5, 0xfd, 0x18,
-	0x02, 0xf9, 0x16, 0x76, 0x72, 0xee, 0x50, 0x6e, 0xd1, 0x8a, 0x2c, 0xaf, 0x78, 0x5c, 0xb2, 0x53,
-	0x1b, 0x9f, 0xc2, 0xbd, 0xc9, 0xcd, 0x6a, 0xc5, 0xbd, 0x40, 0xdc, 0x3d, 0x2a, 0x02, 0x75, 0x6b,
-	0xdd, 0x49, 0x46, 0x70, 0xb8, 0x71, 0x54, 0x8c, 0xac, 0x0f, 0xad, 0xd8, 0xef, 0xc7, 0xdd, 0xc6,
-	0x2e, 0xcd, 0x4d, 0xb4, 0xd2, 0xd1, 0xc1, 0x3f, 0x75, 0xd8, 0x8b, 0x8d, 0x09, 0xf3, 0x7e, 0x76,
-	0x1d, 0x86, 0xcf, 0xa0, 0x95, 0xb4, 0x2e, 0xd8, 0xa1, 0x85, 0x56, 0xce, 0xdc, 0xa7, 0xc5, 0xbe,
-	0x86, 0x28, 0xf8, 0x06, 0x3e, 0x2c, 0xad, 0x8b, 0x78, 0x44, 0x65, 0x1d, 0x81, 0x79, 0x4c, 0xa5,
-	0xe5, 0x94, 0x28, 0x68, 0xc1, 0x07, 0x25, 0x25, 0x0d, 0x1f, 0xd1, 0xea, 0x92, 0x6a, 0x76, 0xa9,
-	0xa4, 0x0a, 0x12, 0x05, 0x7f, 0x10, 0x1a, 0x95, 0x54, 0x09, 0xcc, 0xf0, 0x94, 0xe6, 0x0c, 0xf3,
-	0x31, 0x95, 0x97, 0x17, 0xa2, 0xe0, 0x14, 0x1e, 0x94, 0xe5, 0x7d, 0xec, 0x52, 0x49, 0x8d, 0x31,
-	0x8f, 0xa8, 0xac, 0x58, 0x10, 0x05, 0x67, 0x59, 0x13, 0xb1, 0x99, 0x10, 0x91, 0xd0, 0xad, 0x65,
-	0xc3, 0xfc, 0x88, 0x6e, 0xcf, 0xa8, 0x44, 0xc1, 0x55, 0xa1, 0xc5, 0x29, 0x26, 0x13, 0x3c, 0xa1,
-	0x77, 0x49, 0xaf, 0xe6, 0x29, 0xbd, 0x53, 0x4e, 0x22, 0x0a, 0xda, 0x22, 0x6e, 0x4b, 0xe3, 0x1d,
-	0x7b, 0x74, 0x4b, 0x6e, 0x32, 0x9f, 0xd0, 0x6d, 0xc9, 0x82, 0x28, 0x83, 0x3f, 0x54, 0x38, 0x8c,
-	0x5f, 0xf9, 0x88, 0x2f, 0x97, 0xcc, 0x09, 0xb8, 0x97, 0x3c, 0xf7, 0xd7, 0xb0, 0xbf, 0x11, 0xe2,
-	0xf8, 0x90, 0x56, 0xa5, 0x12, 0xd3, 0xa4, 0x95, 0x19, 0x81, 0x28, 0xf8, 0x12, 0xee, 0x17, 0x82,
-	0x12, 0x0f, 0x69, 0x79, 0x46, 0x30, 0x0d, 0x5a, 0x11, 0xbf, 0x44, 0x19, 0x36, 0xbf, 0xaf, 0x8b,
-	0xbf, 0x53, 0x6f, 0x1b, 0xe2, 0xe7, 0xf9, 0x7f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x97, 0x49, 0xa5,
-	0xf4, 0x66, 0x0d, 0x00, 0x00,
+	// 1032 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x57, 0xcf, 0x72, 0xdb, 0x44,
+	0x18, 0x97, 0x2c, 0xc9, 0x7f, 0xbe, 0xa4, 0x69, 0xb2, 0x84, 0x44, 0x55, 0x9d, 0xd4, 0x5d, 0x9a,
+	0x8c, 0x87, 0xc3, 0x32, 0x75, 0x19, 0x86, 0x19, 0x4e, 0xb5, 0x4d, 0xd3, 0x40, 0x19, 0x3c, 0xeb,
+	0x78, 0xe8, 0xc0, 0x49, 0x55, 0x37, 0xb6, 0x06, 0xc7, 0x6b, 0x24, 0x05, 0x26, 0x33, 0x1c, 0x79,
+	0x06, 0x2e, 0x1c, 0x79, 0x00, 0x1e, 0x84, 0x87, 0xe0, 0xc0, 0x2b, 0xf0, 0x00, 0x8c, 0x56, 0xb2,
+	0xb4, 0x96, 0xa5, 0x75, 0x87, 0x1b, 0x27, 0xef, 0xf7, 0xad, 0x76, 0xf7, 0xb7, 0xbf, 0xdf, 0x7e,
+	0x7f, 0x0c, 0xf7, 0x66, 0xfe, 0x74, 0xf6, 0x93, 0x7b, 0x47, 0x96, 0x01, 0x8f, 0x38, 0xfe, 0x53,
+	0x87, 0xfb, 0x94, 0x4d, 0xfd, 0x30, 0x62, 0x01, 0x65, 0x3f, 0xdc, 0xb2, 0x30, 0x42, 0x04, 0xd0,
+	0x80, 0xdf, 0xdc, 0xf8, 0x51, 0xc4, 0xd8, 0xe8, 0xf6, 0xcd, 0xdc, 0xf7, 0xbe, 0x64, 0x77, 0xb6,
+	0xde, 0xd1, 0xbb, 0x2d, 0x5a, 0x32, 0x83, 0xce, 0x61, 0xef, 0x1b, 0x77, 0x11, 0xb1, 0xb7, 0x5f,
+	0xb1, 0x30, 0x74, 0xa7, 0x2c, 0xb4, 0x6b, 0x1d, 0xa3, 0xdb, 0xa2, 0x05, 0x2f, 0xea, 0xc0, 0x4e,
+	0xb6, 0xfa, 0x72, 0x68, 0x1b, 0x1d, 0xbd, 0xbb, 0x4b, 0x65, 0x17, 0x3a, 0x82, 0xfa, 0x88, 0xb1,
+	0xe0, 0x72, 0x68, 0x9b, 0xe2, 0xb4, 0xd4, 0x42, 0x08, 0x4c, 0xca, 0xe7, 0xcc, 0xb6, 0x84, 0x57,
+	0x8c, 0x63, 0xdf, 0x64, 0x72, 0x39, 0xb4, 0xeb, 0x89, 0x2f, 0x1e, 0xe3, 0x2f, 0xa0, 0x39, 0x09,
+	0x59, 0x20, 0xe6, 0x0f, 0xc1, 0x7a, 0xe5, 0xde, 0xb1, 0x20, 0x05, 0x9e, 0x18, 0xd9, 0x4e, 0x35,
+	0x69, 0xa7, 0x43, 0xb0, 0xc6, 0x33, 0x37, 0x78, 0x2b, 0x10, 0x59, 0x34, 0x31, 0xf0, 0x6b, 0xd8,
+	0xcf, 0x89, 0x09, 0x97, 0x7c, 0x11, 0x32, 0x74, 0x06, 0xe6, 0xc8, 0xf5, 0xe3, 0x2d, 0x8d, 0xee,
+	0x4e, 0xef, 0x80, 0xa4, 0x57, 0xbb, 0xe2, 0x4b, 0xdf, 0x8b, 0x27, 0xa8, 0x98, 0x46, 0x27, 0xd2,
+	0x21, 0x3b, 0xbd, 0x16, 0x59, 0x61, 0x4a, 0xce, 0xc3, 0xbf, 0xea, 0xb0, 0x5f, 0x5c, 0x89, 0x6c,
+	0x68, 0xa4, 0xbe, 0x14, 0xf0, 0xca, 0x8c, 0xe1, 0x89, 0xcf, 0x52, 0x56, 0x13, 0x03, 0x7d, 0x08,
+	0xc6, 0x73, 0x2f, 0xb2, 0x8d, 0x8e, 0xd1, 0xdd, 0xeb, 0xd9, 0x1b, 0x48, 0xc8, 0x73, 0x2f, 0xf2,
+	0xf9, 0x82, 0xc6, 0x1f, 0xe1, 0x73, 0xa8, 0x27, 0x26, 0x02, 0xa8, 0x8f, 0x26, 0xfd, 0xf1, 0xa4,
+	0xbf, 0xaf, 0xa1, 0x06, 0x18, 0xa3, 0x49, 0x7f, 0x5f, 0x8f, 0x07, 0xb1, 0xa7, 0x86, 0xff, 0xd1,
+	0xa1, 0x7d, 0xc1, 0xa2, 0xfe, 0x9c, 0x7b, 0xdf, 0x0b, 0x12, 0xfa, 0x77, 0x2f, 0x99, 0x3f, 0x9d,
+	0x45, 0xab, 0x97, 0x91, 0x31, 0xa5, 0x4b, 0x4c, 0x21, 0x07, 0x9a, 0xe3, 0x25, 0xf3, 0xfc, 0x6b,
+	0x81, 0x51, 0xef, 0x36, 0x69, 0x66, 0xa3, 0x53, 0x80, 0x17, 0x01, 0xbf, 0x49, 0xb6, 0x11, 0x04,
+	0x9b, 0x54, 0xf2, 0xc4, 0x6b, 0xaf, 0x78, 0x3a, 0x6b, 0x8a, 0xd9, 0xcc, 0x8e, 0x29, 0x49, 0x46,
+	0xa1, 0x6d, 0x75, 0x8c, 0xae, 0x49, 0x57, 0x66, 0xbc, 0x2a, 0xde, 0x63, 0xc4, 0xf9, 0x5c, 0xe8,
+	0xdf, 0xa4, 0x99, 0x8d, 0xda, 0xd0, 0x1a, 0xb8, 0xf3, 0xf9, 0x90, 0x2d, 0xa3, 0x99, 0xdd, 0x10,
+	0x38, 0x73, 0x47, 0xf6, 0x6a, 0x9a, 0xd2, 0xab, 0x79, 0x06, 0x27, 0x15, 0xb7, 0x4e, 0x65, 0x47,
+	0x60, 0x0e, 0xdd, 0xc8, 0x15, 0xb2, 0xef, 0x52, 0x31, 0xc6, 0x3f, 0x83, 0x53, 0x5c, 0xe4, 0x86,
+	0x33, 0x35, 0x51, 0x47, 0x50, 0x8f, 0x3f, 0x4a, 0x03, 0x64, 0x97, 0xa6, 0xd6, 0x3a, 0x64, 0xa3,
+	0x0a, 0xb2, 0x29, 0x41, 0x7e, 0x0a, 0x0f, 0x4b, 0x4f, 0x57, 0x00, 0xfe, 0x4b, 0xcf, 0xaf, 0xd9,
+	0x67, 0xae, 0xc7, 0x17, 0x45, 0x75, 0x65, 0x1d, 0x75, 0xa5, 0x8e, 0x35, 0xa5, 0x8e, 0x46, 0xb5,
+	0x8e, 0x66, 0xb5, 0x8e, 0x96, 0x4a, 0xc7, 0x7a, 0x15, 0x29, 0x0d, 0x89, 0x94, 0x8f, 0xe1, 0xb4,
+	0xea, 0x82, 0x0a, 0x5e, 0xa6, 0x39, 0x95, 0xd9, 0x2a, 0x49, 0xc9, 0x5c, 0x33, 0xbd, 0x5a, 0xb3,
+	0x5a, 0x15, 0x3c, 0x43, 0x82, 0xd7, 0xcb, 0x83, 0x6b, 0xfd, 0x20, 0x05, 0xb8, 0xdf, 0x6a, 0xf0,
+	0x78, 0xb5, 0x68, 0x10, 0xf0, 0x30, 0x2c, 0x0d, 0xcb, 0x36, 0xb4, 0x62, 0xda, 0xe4, 0x17, 0x97,
+	0x3b, 0x62, 0xfa, 0xaf, 0x78, 0x32, 0x97, 0xe0, 0x5c, 0x99, 0x6b, 0x82, 0x1b, 0x4a, 0xc1, 0x4d,
+	0xa5, 0xe0, 0x56, 0xb5, 0xe0, 0xf5, 0x6a, 0xc1, 0x1b, 0x2a, 0xc1, 0x9b, 0x55, 0x8c, 0xb6, 0x24,
+	0x46, 0x3f, 0x05, 0xac, 0x22, 0x47, 0xc1, 0xeb, 0x2f, 0x35, 0x78, 0xb2, 0x16, 0x40, 0x57, 0xbc,
+	0x3c, 0x26, 0xd4, 0xd4, 0xfe, 0xdf, 0x33, 0xdf, 0x67, 0x70, 0xb6, 0x85, 0x05, 0x05, 0x87, 0xbf,
+	0xeb, 0xf0, 0xa8, 0x94, 0x7e, 0x29, 0x7a, 0xfe, 0xeb, 0xcb, 0xcc, 0xa3, 0xce, 0xa8, 0x8e, 0x3a,
+	0xb3, 0xea, 0x8a, 0x96, 0x74, 0xc5, 0x4f, 0xa0, 0x53, 0x0d, 0x52, 0x71, 0x3b, 0x0a, 0xf6, 0x05,
+	0x8b, 0x06, 0x33, 0xd7, 0x5f, 0x64, 0x1d, 0x8a, 0x94, 0xdd, 0x3f, 0x5f, 0x72, 0x6f, 0xb6, 0xca,
+	0xee, 0xc2, 0x28, 0xb6, 0x37, 0xc9, 0x8d, 0x64, 0x17, 0xfe, 0x08, 0x1e, 0x94, 0xec, 0xb9, 0x01,
+	0x42, 0xcf, 0x40, 0xd8, 0x70, 0x74, 0xc1, 0xa2, 0x97, 0x49, 0xc7, 0x76, 0xb9, 0xb8, 0xe6, 0x61,
+	0x0a, 0x01, 0x7f, 0x0d, 0x3b, 0x92, 0x3b, 0x7e, 0x16, 0xa2, 0x55, 0x5a, 0x5c, 0xf3, 0xb4, 0x7d,
+	0xc8, 0x6c, 0xf4, 0x04, 0xee, 0x8d, 0x6f, 0x97, 0x4b, 0x1e, 0x44, 0xe2, 0xee, 0x49, 0xf1, 0xb1,
+	0xe8, 0xba, 0x13, 0x0f, 0xe0, 0x78, 0xe3, 0xa8, 0x14, 0x59, 0x17, 0x9a, 0xa9, 0x3f, 0x4c, 0x3b,
+	0x9f, 0x5d, 0x22, 0x7d, 0x48, 0xb3, 0xd9, 0xde, 0xdf, 0x16, 0xec, 0xa5, 0xc6, 0x98, 0x05, 0x3f,
+	0xfa, 0x1e, 0x43, 0x4f, 0xa1, 0xb9, 0x6a, 0xa3, 0xd0, 0x3e, 0x29, 0xb4, 0x9a, 0xce, 0x01, 0x29,
+	0xf6, 0x58, 0x58, 0x43, 0xaf, 0xe1, 0xfd, 0xd2, 0x7a, 0x8c, 0x4e, 0x88, 0xaa, 0x3b, 0x71, 0x4e,
+	0x89, 0xb2, 0x8c, 0x63, 0x0d, 0x51, 0x78, 0xaf, 0xa4, 0x6c, 0xa2, 0x87, 0xa4, 0xba, 0x94, 0x3b,
+	0x6d, 0xa2, 0xa8, 0xb4, 0x58, 0x43, 0xdf, 0x09, 0x8d, 0x4a, 0xaa, 0x0e, 0xca, 0xf1, 0x94, 0xe6,
+	0x16, 0xe7, 0x11, 0x51, 0x97, 0x2b, 0xac, 0xa1, 0x09, 0x1c, 0x96, 0xd5, 0x0c, 0xd4, 0x26, 0x8a,
+	0x9a, 0xe5, 0x9c, 0x10, 0x55, 0xa1, 0xc1, 0x1a, 0x9a, 0xe6, 0xcd, 0xcb, 0x66, 0xe2, 0x44, 0x98,
+	0x6c, 0x2d, 0x39, 0xce, 0x07, 0x64, 0x7b, 0xe6, 0xc5, 0x1a, 0x5a, 0x16, 0x5a, 0xab, 0x62, 0x82,
+	0x41, 0x67, 0xe4, 0x5d, 0xd2, 0xb0, 0x73, 0x4e, 0xde, 0x29, 0x4f, 0x61, 0x0d, 0xb9, 0x22, 0x6e,
+	0x4b, 0xe3, 0x1d, 0x75, 0xc8, 0x96, 0x7c, 0xe5, 0x3c, 0x26, 0xdb, 0x92, 0x05, 0xd6, 0x7a, 0x7f,
+	0xe8, 0x70, 0x9c, 0xbe, 0xf2, 0x01, 0x5f, 0x2c, 0x98, 0x17, 0xf1, 0x60, 0xf5, 0xdc, 0x5f, 0xc1,
+	0xc1, 0x46, 0x88, 0xa3, 0x07, 0xa4, 0x2a, 0x95, 0x38, 0x0e, 0xa9, 0xcc, 0x08, 0x58, 0x43, 0x2f,
+	0xe0, 0x7e, 0x21, 0x28, 0xd1, 0x31, 0x29, 0xcf, 0x08, 0x8e, 0x4d, 0x2a, 0xe2, 0x17, 0x6b, 0xfd,
+	0xc6, 0xb7, 0x96, 0xf8, 0xbb, 0xf7, 0xa6, 0x2e, 0x7e, 0x9e, 0xfd, 0x1b, 0x00, 0x00, 0xff, 0xff,
+	0xaf, 0x90, 0x3b, 0xb5, 0x06, 0x0e, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1385,6 +1740,9 @@ type HighwayServiceClient interface {
 	GetBlockCrossShardByHeight(ctx context.Context, in *GetBlockCrossShardByHeightRequest, opts ...grpc.CallOption) (*GetBlockCrossShardByHeightResponse, error)
 	GetBlockShardToBeaconByHeight(ctx context.Context, in *GetBlockShardToBeaconByHeightRequest, opts ...grpc.CallOption) (*GetBlockShardToBeaconByHeightResponse, error)
 	GetBlockCrossShardByHash(ctx context.Context, in *GetBlockCrossShardByHashRequest, opts ...grpc.CallOption) (*GetBlockCrossShardByHashResponse, error)
+	StreamBlockBeaconByHeight(ctx context.Context, in *GetBlockBeaconByHeightRequest, opts ...grpc.CallOption) (HighwayService_StreamBlockBeaconByHeightClient, error)
+	StreamBlockBeaconByHash(ctx context.Context, in *BlockBeaconByHashRequest, opts ...grpc.CallOption) (HighwayService_StreamBlockBeaconByHashClient, error)
+	StreamBlockByHeight(ctx context.Context, in *BlockByHeightRequest, opts ...grpc.CallOption) (HighwayService_StreamBlockByHeightClient, error)
 }
 
 type highwayServiceClient struct {
@@ -1467,6 +1825,102 @@ func (c *highwayServiceClient) GetBlockCrossShardByHash(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *highwayServiceClient) StreamBlockBeaconByHeight(ctx context.Context, in *GetBlockBeaconByHeightRequest, opts ...grpc.CallOption) (HighwayService_StreamBlockBeaconByHeightClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_HighwayService_serviceDesc.Streams[0], "/HighwayService/StreamBlockBeaconByHeight", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &highwayServiceStreamBlockBeaconByHeightClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type HighwayService_StreamBlockBeaconByHeightClient interface {
+	Recv() (*BlockData, error)
+	grpc.ClientStream
+}
+
+type highwayServiceStreamBlockBeaconByHeightClient struct {
+	grpc.ClientStream
+}
+
+func (x *highwayServiceStreamBlockBeaconByHeightClient) Recv() (*BlockData, error) {
+	m := new(BlockData)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *highwayServiceClient) StreamBlockBeaconByHash(ctx context.Context, in *BlockBeaconByHashRequest, opts ...grpc.CallOption) (HighwayService_StreamBlockBeaconByHashClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_HighwayService_serviceDesc.Streams[1], "/HighwayService/StreamBlockBeaconByHash", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &highwayServiceStreamBlockBeaconByHashClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type HighwayService_StreamBlockBeaconByHashClient interface {
+	Recv() (*BlockData, error)
+	grpc.ClientStream
+}
+
+type highwayServiceStreamBlockBeaconByHashClient struct {
+	grpc.ClientStream
+}
+
+func (x *highwayServiceStreamBlockBeaconByHashClient) Recv() (*BlockData, error) {
+	m := new(BlockData)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *highwayServiceClient) StreamBlockByHeight(ctx context.Context, in *BlockByHeightRequest, opts ...grpc.CallOption) (HighwayService_StreamBlockByHeightClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_HighwayService_serviceDesc.Streams[2], "/HighwayService/StreamBlockByHeight", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &highwayServiceStreamBlockByHeightClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type HighwayService_StreamBlockByHeightClient interface {
+	Recv() (*BlockData, error)
+	grpc.ClientStream
+}
+
+type highwayServiceStreamBlockByHeightClient struct {
+	grpc.ClientStream
+}
+
+func (x *highwayServiceStreamBlockByHeightClient) Recv() (*BlockData, error) {
+	m := new(BlockData)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // HighwayServiceServer is the server API for HighwayService service.
 type HighwayServiceServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
@@ -1477,6 +1931,9 @@ type HighwayServiceServer interface {
 	GetBlockCrossShardByHeight(context.Context, *GetBlockCrossShardByHeightRequest) (*GetBlockCrossShardByHeightResponse, error)
 	GetBlockShardToBeaconByHeight(context.Context, *GetBlockShardToBeaconByHeightRequest) (*GetBlockShardToBeaconByHeightResponse, error)
 	GetBlockCrossShardByHash(context.Context, *GetBlockCrossShardByHashRequest) (*GetBlockCrossShardByHashResponse, error)
+	StreamBlockBeaconByHeight(*GetBlockBeaconByHeightRequest, HighwayService_StreamBlockBeaconByHeightServer) error
+	StreamBlockBeaconByHash(*BlockBeaconByHashRequest, HighwayService_StreamBlockBeaconByHashServer) error
+	StreamBlockByHeight(*BlockByHeightRequest, HighwayService_StreamBlockByHeightServer) error
 }
 
 // UnimplementedHighwayServiceServer can be embedded to have forward compatible implementations.
@@ -1506,6 +1963,15 @@ func (*UnimplementedHighwayServiceServer) GetBlockShardToBeaconByHeight(ctx cont
 }
 func (*UnimplementedHighwayServiceServer) GetBlockCrossShardByHash(ctx context.Context, req *GetBlockCrossShardByHashRequest) (*GetBlockCrossShardByHashResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBlockCrossShardByHash not implemented")
+}
+func (*UnimplementedHighwayServiceServer) StreamBlockBeaconByHeight(req *GetBlockBeaconByHeightRequest, srv HighwayService_StreamBlockBeaconByHeightServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamBlockBeaconByHeight not implemented")
+}
+func (*UnimplementedHighwayServiceServer) StreamBlockBeaconByHash(req *BlockBeaconByHashRequest, srv HighwayService_StreamBlockBeaconByHashServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamBlockBeaconByHash not implemented")
+}
+func (*UnimplementedHighwayServiceServer) StreamBlockByHeight(req *BlockByHeightRequest, srv HighwayService_StreamBlockByHeightServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamBlockByHeight not implemented")
 }
 
 func RegisterHighwayServiceServer(s *grpc.Server, srv HighwayServiceServer) {
@@ -1656,6 +2122,69 @@ func _HighwayService_GetBlockCrossShardByHash_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HighwayService_StreamBlockBeaconByHeight_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetBlockBeaconByHeightRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(HighwayServiceServer).StreamBlockBeaconByHeight(m, &highwayServiceStreamBlockBeaconByHeightServer{stream})
+}
+
+type HighwayService_StreamBlockBeaconByHeightServer interface {
+	Send(*BlockData) error
+	grpc.ServerStream
+}
+
+type highwayServiceStreamBlockBeaconByHeightServer struct {
+	grpc.ServerStream
+}
+
+func (x *highwayServiceStreamBlockBeaconByHeightServer) Send(m *BlockData) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _HighwayService_StreamBlockBeaconByHash_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(BlockBeaconByHashRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(HighwayServiceServer).StreamBlockBeaconByHash(m, &highwayServiceStreamBlockBeaconByHashServer{stream})
+}
+
+type HighwayService_StreamBlockBeaconByHashServer interface {
+	Send(*BlockData) error
+	grpc.ServerStream
+}
+
+type highwayServiceStreamBlockBeaconByHashServer struct {
+	grpc.ServerStream
+}
+
+func (x *highwayServiceStreamBlockBeaconByHashServer) Send(m *BlockData) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _HighwayService_StreamBlockByHeight_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(BlockByHeightRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(HighwayServiceServer).StreamBlockByHeight(m, &highwayServiceStreamBlockByHeightServer{stream})
+}
+
+type HighwayService_StreamBlockByHeightServer interface {
+	Send(*BlockData) error
+	grpc.ServerStream
+}
+
+type highwayServiceStreamBlockByHeightServer struct {
+	grpc.ServerStream
+}
+
+func (x *highwayServiceStreamBlockByHeightServer) Send(m *BlockData) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 var _HighwayService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "HighwayService",
 	HandlerType: (*HighwayServiceServer)(nil),
@@ -1693,7 +2222,23 @@ var _HighwayService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _HighwayService_GetBlockCrossShardByHash_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamBlockBeaconByHeight",
+			Handler:       _HighwayService_StreamBlockBeaconByHeight_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "StreamBlockBeaconByHash",
+			Handler:       _HighwayService_StreamBlockBeaconByHash_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "StreamBlockByHeight",
+			Handler:       _HighwayService_StreamBlockByHeight_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "highway.proto",
 }
 
