@@ -28,38 +28,38 @@ func (d *Dispatcher) processStreamBlk(blktype byte, data []byte) error {
 		newBlk := new(blockchain.BeaconBlock)
 		err := wrapper.DeCom(data, newBlk)
 		if err != nil {
-			Logger.Infof("[stream] process stream beacon block return error %v", err)
+			//Logger.Infof("[stream] process stream beacon block return error %v", err)
 			return err
 		}
-		Logger.Infof("[stream] Got beacon block %v", newBlk.GetHeight())
+		//Logger.Infof("[stream] Got beacon block %v", newBlk.GetHeight())
 		d.BC.OnBlockBeaconReceived(newBlk)
 	case byte(proto.BlkType_BlkShard):
 		newBlk := new(blockchain.ShardBlock)
 		err := wrapper.DeCom(data, newBlk)
 		if err != nil {
-			Logger.Infof("[stream] process stream block return error %v", err)
+			//Logger.Infof("[stream] process stream block return error %v", err)
 			return err
 		}
-		Logger.Infof("[stream] Got Shard Block height %v, shard %v", newBlk.GetHeight(), newBlk.Header.ShardID)
+		//Logger.Infof("[stream] Got Shard Block height %v, shard %v", newBlk.GetHeight(), newBlk.Header.ShardID)
 		d.BC.OnBlockShardReceived(newBlk)
 	case byte(proto.BlkType_BlkS2B):
 		newBlk := new(blockchain.ShardToBeaconBlock)
 		err := wrapper.DeCom(data, newBlk)
 		if err != nil {
-			Logger.Infof("[stream] process stream S2B block return error %v", err)
+			//Logger.Infof("[stream] process stream S2B block return error %v", err)
 			return err
 		}
-		Logger.Infof("[stream] Got S2B block height %v shard %v", newBlk.GetHeight(), newBlk.Header.ShardID)
+		//Logger.Infof("[stream] Got S2B block height %v shard %v", newBlk.GetHeight(), newBlk.Header.ShardID)
 		d.BC.OnShardToBeaconBlockReceived(newBlk)
 	case byte(proto.BlkType_BlkXShard):
 		newBlk := new(blockchain.CrossShardBlock)
 		err := wrapper.DeCom(data, newBlk)
-		Logger.Infof("[stream] Got block %v", newBlk.GetHeight())
+		//Logger.Infof("[stream] Got block %v", newBlk.GetHeight())
 		if err != nil {
-			Logger.Infof("[stream] process stream Cross shard block return error %v", err)
+			//Logger.Infof("[stream] process stream Cross shard block return error %v", err)
 			return err
 		}
-		Logger.Infof("[stream] Got Cross block height %v shard %v to shard %v", newBlk.GetHeight(), newBlk.Header.ShardID, newBlk.ToShardID)
+		//Logger.Infof("[stream] Got Cross block height %v shard %v to shard %v", newBlk.GetHeight(), newBlk.Header.ShardID, newBlk.ToShardID)
 		d.BC.OnCrossShardBlockReceived(newBlk)
 	default:
 		return errors.Errorf("[stream] Not implement for this block type %v", blktype)

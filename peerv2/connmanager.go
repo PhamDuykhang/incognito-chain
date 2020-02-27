@@ -192,7 +192,7 @@ func (cm *ConnManager) PutMessage(msg *pubsub.Message) {
 }
 
 func (cm *ConnManager) PutData(data []byte) {
-	Logger.Infof("[stream] Put data to cm.data")
+	//Logger.Infof("[stream] Put data to cm.data")
 	cm.data <- data
 }
 
@@ -205,7 +205,7 @@ func (cm *ConnManager) process() {
 				Logger.Warn(err)
 			}
 		case data := <-cm.data:
-			Logger.Infof("[stream] process data")
+			//Logger.Infof("[stream] process data")
 			err := cm.disp.processStreamBlk(data[0], data[1:])
 			if err != nil {
 				Logger.Warn(err)

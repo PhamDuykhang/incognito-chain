@@ -27,15 +27,15 @@ func EnCom(data interface{}) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	Logger.Infof("[stream] Time Encode %v", time.Since(s).Seconds())
+	//Logger.Infof("[stream] Time Encode %v", time.Since(s).Seconds())
 	s = time.Now()
 	// compresser, err := zstd.NewWriter(nil, zstd.WithEncoderLevel(zstd.SpeedBestCompression))
 	// if err != nil {
 	// 	return nil, err
 	// }
 	res := compresser.EncodeAll(b, nil)
-	Logger.Infof("[stream] Time Compress %v", time.Since(s).Seconds())
-	Logger.Infof("[stream] Time %v, Len encode %v len compress %v Ratio %v", time.Since(s).Seconds(), len(b), len(res), float64(len(b))/float64(len(res)))
+	//Logger.Infof("[stream] Time Compress %v", time.Since(s).Seconds())
+	//Logger.Infof("[stream] Time %v, Len encode %v len compress %v Ratio %v", time.Since(s).Seconds(), len(b), len(res), float64(len(b))/float64(len(res)))
 	return res, nil
 }
 
@@ -63,11 +63,11 @@ func OldEnCom(data interface{}) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	Logger.Infof("[stream] Time Encode %v", time.Since(s).Seconds())
+	//Logger.Infof("[stream] Time Encode %v", time.Since(s).Seconds())
 	s = time.Now()
 	messageBytes, err := common.GZipFromBytes(jsonBytes)
-	Logger.Infof("[stream] Time Compress %v", time.Since(s).Seconds())
-	Logger.Infof("[stream] Time %v, Len encode %v len compress %v Ratio %v", time.Since(s).Seconds(), len(jsonBytes), len(messageBytes), float64(len(jsonBytes))/float64(len(messageBytes)))
+	//Logger.Infof("[stream] Time Compress %v", time.Since(s).Seconds())
+	//Logger.Infof("[stream] Time %v, Len encode %v len compress %v Ratio %v", time.Since(s).Seconds(), len(jsonBytes), len(messageBytes), float64(len(jsonBytes))/float64(len(messageBytes)))
 	return messageBytes, nil
 }
 
